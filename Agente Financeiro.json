@@ -1,0 +1,505 @@
+{
+  "name": "Agente Financeiro",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "848eba58-6dbe-4c61-af96-b138c12168f8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        -80
+      ],
+      "id": "99dad051-5884-41cb-8c56-8f7ba9688516",
+      "name": "Webhook",
+      "webhookId": "848eba58-6dbe-4c61-af96-b138c12168f8"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=  {{ $('Webhook').item.json.body.data.message.conversation }}",
+        "options": {
+          "systemMessage": "=Data e Hora atual: {{ new Date().toDateTime().toISO() }} - {{ [\"domingo\", \"segunda-feira\", \"terça-feira\", \"quarta-feira\", \"quinta-feira\", \"sexta-feira\", \"sábado\"][$now.extract(\"weekday\") % 7] }}\n# 🤖 Prompt: Agente Financeiro com Planilha e Raciocínio Interno\nVocê é um assistente financeiro pessoal inteligente. Usa a ferramenta `think` para organizar ideias e tomar decisões antes de responder. Também tem acesso à ferramenta **Google Sheets1** para registrar e analisar as finanças do usuário.\n---\n## 🧠 Antes de responder:\n- Use `think` para checar se os dados recebidos estão completos.\n- Planeje: monte estrutura da planilha, agrupe por mês, some entradas e saídas.\n- Só depois disso, responda com os dados organizados.\n---\n## 📥 Coleta de dados\nSe o usuário ainda não mandou os dados, peça o seguinte para cada transação (pode mandar várias, separadas por linha):\n- **Data** (DD/MM/AAAA)\n- **Tipo**: Entrada ou Saída\n- **Valor (R$)**\n- **Categoria** (ex: alimentação, moradia, transporte etc.)\n- **Descrição** (opcional)\n---\n## 📊 Preenchimento na planilha (via Google Sheets1)\nCrie/atualize uma planilha com as colunas:\n| Data | Tipo | Valor (R$) | Categoria | Descrição |\n- Valide os dados com `think`, corrija erros ou campos ausentes.\n- Preencha automaticamente na planilha do Google Sheets1.\n---\n## 📈 Relatório financeiro mensal\nDepois que os dados estiverem na planilha:\n1. **Resumo do mês**\n- Total de entradas\n- Total de saídas\n- Saldo final\n2. **Ranking de categorias** (gastos maiores no topo)\n3. **Dicas de economia personalizadas**\n4. **Alertas de excesso**\n- Gastos acima de 30% da média da categoria\n- Saldo negativo 2 meses seguidos\n- Gastos atípicos\n---\n## 🧠 Exemplo de uso da ferramenta `think` (interno, não mostrar ao usuário)\n```think\nVerificar se alguma categoria representa mais de 40% das saídas. Se sim, sinalizar como excesso.\nSe o saldo for negativo por 2 meses seguidos, sugerir ajustes.\nComparar quanto foi gasto em lazer vs. necessidades básicas.\n## Regras\n- Não usar markdown na resposta\n- Ser direto, simples e parecer uma conversa de WhatsApp\n- Linguagem neutra e jovem\n- - Nunca utilize códigos de emoji como :light_bulb:, :rocket:, :white_check_mark:.\n- Utilize apenas emojis Unicode (💡 🚀 ✅) ou não utilize emojis.\n- A resposta deve parecer uma conversa natural no WhatsApp."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -128,
+        -128
+      ],
+      "id": "380b2325-a95f-46d4-821d-29c21e16ddff",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.sender }}",
+        "sessionTTL": 7,
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.6,
+      "position": [
+        -224,
+        192
+      ],
+      "id": "b2da7ab8-a0a0-44e0-bfea-288442b2944a",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "yrz5iP02gpBsqA9E",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        192
+      ],
+      "id": "9c6bac93-5a4e-4a47-b28a-676f2e3c626c",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        176
+      ],
+      "id": "71ab5d18-9e1d-4f58-aebf-a14fc802dea2",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "qjEhyqdYc0cjlFpW",
+          "name": "OpenRouter Free - Pacheco AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sfm4RfA1tXUF3Ld5UdOTptG4MGaFL44JRJOBntFqJ6Y",
+          "mode": "list",
+          "cachedResultName": "Agente Financeiro",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sfm4RfA1tXUF3Ld5UdOTptG4MGaFL44JRJOBntFqJ6Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sfm4RfA1tXUF3Ld5UdOTptG4MGaFL44JRJOBntFqJ6Y/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        176
+      ],
+      "id": "cc7ad8ac-7f65-496d-886b-da60f68ea077",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lUcnEG5s012bbTZe",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1sfm4RfA1tXUF3Ld5UdOTptG4MGaFL44JRJOBntFqJ6Y",
+          "mode": "list",
+          "cachedResultName": "Agente Financeiro",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sfm4RfA1tXUF3Ld5UdOTptG4MGaFL44JRJOBntFqJ6Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sfm4RfA1tXUF3Ld5UdOTptG4MGaFL44JRJOBntFqJ6Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Data', ``, 'string') }}",
+            "Tipo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tipo', ``, 'string') }}",
+            "Categoria": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Categoria', ``, 'string') }}",
+            "Descrição": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Descri__o', ``, 'string') }}",
+            "Valor": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Valor', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Descrição",
+              "displayName": "Descrição",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -16,
+        176
+      ],
+      "id": "fc42c263-c36b-4ac6-9fe3-6feb84ad4fab",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lUcnEG5s012bbTZe",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "aulas-n8n",
+        "remoteJid": "={{ $('Webhook').item.json.body.sender }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        608,
+        -80
+      ],
+      "id": "d0139445-f7a0-42ba-882c-0faf6c424abd",
+      "name": "Enviar texto",
+      "credentials": {
+        "evolutionApi": {
+          "id": "uSxlP9uKMZddtvlt",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "##Trigguer Webhook\nRecebemos Msg para WhatsA\npp",
+        "height": 256,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        -176
+      ],
+      "id": "434352fc-f14c-4d65-af97-d75c190ab36c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "AGENTE DE IA",
+        "height": 528,
+        "width": 1040,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        -176
+      ],
+      "id": "578fc3df-df1a-4340-aef2-16bb9a91267e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": " Modelo DA IA\nInteligencia do agente\n",
+        "height": 240,
+        "width": 192,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        80
+      ],
+      "id": "6c7274cf-1df6-44af-87fb-bc5feea0ffe7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Memoria da IA\nadiciona um texto para o agente\n",
+        "height": 240,
+        "width": 192,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        80
+      ],
+      "id": "2faaacea-0790-4b9c-baf6-19c5ca4357ac",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Memoria da IA\nFerramenta para controle de planilha",
+        "height": 256,
+        "width": 368,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        80
+      ],
+      "id": "cac7fa67-9a5e-4f17-91a8-861f69e8a1c7",
+      "name": "Sticky Note4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Cerébro da IA\nPermite que pensa nos passes antes de executar\n",
+        "height": 240,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        304,
+        80
+      ],
+      "id": "a0ff3953-7b71-44f0-91e6-26df896c34ed",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "Envio da mensagem no WhatsApp\n",
+        "height": 256,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "048a3658-823e-45f2-955f-cb55bd2e0311",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "treinamento-n8n-n8n-webhook.cmvu9t.easypanel.host",
+            "user-agent": "axios/1.10.0",
+            "content-length": "661",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.16.1.1",
+            "x-forwarded-host": "treinamento-n8n-n8n-webhook.cmvu9t.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "d0728d7f774b",
+            "x-real-ip": "172.16.1.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "aulas-n8n",
+            "data": {
+              "key": {
+                "remoteJid": "266185614614545@lid",
+                "fromMe": true,
+                "id": "3A3C378670F7F7493F84"
+              },
+              "pushName": "Matheus P",
+              "status": "SERVER_ACK",
+              "message": {
+                "conversation": "Oi"
+              },
+              "messageType": "conversation",
+              "messageTimestamp": 1784087237,
+              "instanceId": "3faa80ab-4afb-4aae-804e-28e627f8985c",
+              "source": "ios"
+            },
+            "destination": "https://treinamento-n8n-n8n-webhook.cmvu9t.easypanel.host/webhook/848eba58-6dbe-4c61-af96-b138c12168f8",
+            "date_time": "2026-07-15T00:47:17.885Z",
+            "sender": "554491622338@s.whatsapp.net",
+            "server_url": "https://treinamento-n8n-evolution.cmvu9t.easypanel.host",
+            "apikey": "BC014DE8F448-4DAF-A304-8F3FB34756EF"
+          },
+          "webhookUrl": "https://treinamento-n8n-n8n-webhook.cmvu9t.easypanel.host/webhook/848eba58-6dbe-4c61-af96-b138c12168f8",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Enviar texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "43638fa1-98cf-4f4c-af0d-a7bfe1f52bfa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab73e3b4c1bd2a0ed2b1d1e2e82aebc92bc35eca0f7396b5c6341f4c50eb29fa"
+  },
+  "nodeGroups": [],
+  "id": "1fay4hJ0uK64gXfZ",
+  "tags": []
+}
