@@ -5,7 +5,8 @@ AI-powered personal finance assistant built with n8n, WhatsApp, Evolution API, G
 An AI-powered financial assistant built with n8n that helps users manage their personal finances through WhatsApp.
 # 💰 AI Financial Agent for WhatsApp
 
-![Workflow](images/workflow.png)
+<img width="1918" height="872" alt="Agente Financeiro IA" src="https://github.com/user-attachments/assets/3b117fe1-8079-4ae4-b6ca-bc658d6e4ba9" />
+
 
 ## Features
 
